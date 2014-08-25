@@ -1,0 +1,50 @@
+subprojects {
+	apply plugin: 'java'
+
+	version = '0.1-SNAPSHOT'
+
+	// Java 7
+	sourceCompatibility = 1.7
+	targetCompatibility = 1.7
+
+	sourceSets {
+		dist
+	}
+
+	repositories {
+	   flatDir {
+	       dirs "$rootDir/libs"
+	   }
+	   mavenCentral()
+	}
+
+    jar {
+        manifest {
+            attributes 'Implementation-Title': project.name, 'Implementation-Version': project.version
+        }
+    }
+
+	dependencies {
+		compile name: 'IDK-Server-Java'
+	}
+
+	// contains a ZIP usable for distributing
+	task distZip(type: Zip) {
+	    from(sourceSets.dist.output) {
+	    	into 'plugins'
+	    }
+	    from(jar.outputs.files) {
+	    	into 'libs'
+	    }
+
+	    classifier = 'dist'
+	}
+
+	// this task can be called when wanting to create a distribution
+	task dist {}
+
+	dist.dependsOn jar
+	dist.dependsOn distZip
+
+	build.dependsOn dist
+}
